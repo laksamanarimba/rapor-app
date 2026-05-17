@@ -1,0 +1,8 @@
+{
+  "name": "rapor-naratif-app",
+  "version": "1.0.0",
+  "description": "Asisten Rapor Naratif Kurikulum Merdeka",
+  "engines": {
+    "node": ">=18"
+  }
+}

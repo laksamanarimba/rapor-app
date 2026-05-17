@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asisten Rapor Naratif — Kurikulum Merdeka</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #1a1a2e;
+      --ink-mid:   #3d3d5c;
+      --ink-soft:  #7a7a9d;
+      --paper:     #faf8f3;
+      --paper-alt: #f2efe8;
+      --gold:      #c8973a;
+      --gold-lt:   #e8c97a;
+      --accent:    #2d6a4f;
+      --accent-lt: #52b788;
+      --danger:    #c0392b;
+      --border:    #ddd9ce;
+      --shadow:    0 4px 24px rgba(26,26,46,0.10);
+      --shadow-lg: 0 12px 48px rgba(26,26,46,0.16);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper-alt);
+      color: var(--ink);
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 3px solid var(--gold);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-icon {
+      width: 36px; height: 36px;
+      background: var(--gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+    }
+
+    .header-sub {
+      font-size: 0.72rem;
+      color: var(--gold-lt);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .header-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Layout ── */
+    .workspace {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    /* ── Left Panel ── */
+    .panel-left {
+      background: var(--paper);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-section {
+      padding: 24px 24px 0;
+    }
+
+    .panel-section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--ink);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.73rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: var(--paper-alt);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: none;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+      background: #fff;
+    }
+
+    textarea { min-height: 90px; line-height: 1.55; }
+
+    .char-hint {
+      font-size: 0.68rem;
+      color: var(--ink-soft);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* ── Generate Button ── */
+    .panel-footer {
+      padding: 20px 24px 24px;
+      margin-top: auto;
+    }
+
+    .btn-generate {
+      width: 100%;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-generate:hover:not(:disabled) { background: var(--accent); }
+    .btn-generate:active:not(:disabled) { transform: scale(0.98); }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-icon { font-size: 1.1rem; }
+
+    /* ── Right Panel ── */
+    .panel-right {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--paper-alt);
+    }
+
+    .preview-toolbar {
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .preview-toolbar-title {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .toolbar-spacer { flex: 1; }
+
+    .btn-copy {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      padding: 6px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-mid);
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Document Canvas ── */
+    .preview-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 36px 48px;
+    }
+
+    .doc-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      min-height: 600px;
+      max-width: 760px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .doc-header {
+      background: var(--ink);
+      padding: 28px 36px 22px;
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .doc-header-school {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--paper);
+      margin-bottom: 4px;
+    }
+
+    .doc-header-sub {
+      font-size: 0.75rem;
+      color: var(--gold-lt);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .doc-meta {
+      display: flex;
+      gap: 24px;
+      padding: 16px 36px;
+      border-bottom: 1px solid var(--border);
+      background: var(--paper);
+    }
+
+    .meta-item { font-size: 0.82rem; color: var(--ink-mid); }
+    .meta-label { font-weight: 500; color: var(--ink); }
+
+    .doc-body {
+      padding: 28px 36px 36px;
+      min-height: 400px;
+    }
+
+    /* ── States ── */
+    .state-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 360px;
+      color: var(--ink-soft);
+      text-align: center;
+      gap: 12px;
+      padding: 40px;
+    }
+
+    .state-empty-icon { font-size: 3rem; opacity: 0.4; }
+    .state-empty-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--ink-mid); }
+    .state-empty-desc { font-size: 0.83rem; line-height: 1.6; max-width: 280px; }
+
+    .state-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 200px;
+      color: var(--ink-soft);
+    }
+
+    .loader-dots {
+      display: flex; gap: 6px;
+    }
+    .loader-dots span {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* ── Output Content ── */
+    .output-section-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-section-label::before {
+      content: '';
+      display: block;
+      width: 20px; height: 2px;
+      background: var(--gold);
+    }
+
+    .narrative-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--ink);
+      margin-bottom: 28px;
+      white-space: pre-wrap;
+    }
+
+    /* Markdown table rendering */
+    .rubrik-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin-top: 8px;
+    }
+
+    .rubrik-table th {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .rubrik-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink-mid);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .rubrik-table tr:nth-child(even) td { background: var(--paper-alt); }
+    .rubrik-table tr:last-child td { border-bottom: none; }
+
+    .raw-output {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.83rem;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      white-space: pre-wrap;
+    }
+
+    .error-box {
+      background: #fff5f5;
+      border: 1.5px solid var(--danger);
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: var(--danger);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      padding: 8px 28px;
+      background: var(--paper);
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent-lt);
+    }
+
+    .status-dot.busy { background: var(--gold); animation: pulse 1s infinite; }
+    .status-dot.error { background: var(--danger); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; }
+      .panel-left { height: auto; }
+      .panel-right { height: 70vh; }
+      .preview-scroll { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">📋</div>
+  <div>
+    <div class="header-title">Asisten Rapor Naratif</div>
+    <div class="header-sub">Kurikulum Merdeka · Powered by AI</div>
+  </div>
+  <div class="header-badge">✦ Versi 1.0</div>
+</header>
+
+<div class="workspace">
+
+  <!-- ── Left Panel: Form ── -->
+  <div class="panel-left">
+    <div class="panel-section">
+      <div class="panel-section-title">Data Siswa &amp; Catatan Guru</div>
+
+      <div class="field">
+        <label>Nama Siswa</label>
+        <input type="text" id="studentName" placeholder="Contoh: Budi Santoso" maxlength="80" />
+      </div>
+
+      <div class="field">
+        <label>Topik / Mata Pelajaran</label>
+        <input type="text" id="topic" placeholder="Contoh: Matematika — Pecahan Desimal" maxlength="120" />
+      </div>
+
+      <div class="field">
+        <label>Kelebihan / Capaian Positif</label>
+        <textarea id="strengths" placeholder="Contoh: aktif bertanya, mudah memahami konsep baru, sering membantu teman..." maxlength="600"></textarea>
+        <div class="char-hint"><span id="str-count">0</span>/600</div>
+      </div>
+
+      <div class="field">
+        <label>Kelemahan / Area Pengembangan</label>
+        <textarea id="weaknesses" placeholder="Contoh: perlu latihan lebih pada soal cerita, kadang kurang teliti dalam perhitungan..." maxlength="600"></textarea>
+        <div class="char-hint"><span id="wk-count">0</span>/600</div>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn-generate" id="btnGenerate" onclick="generate()">
+        <span class="btn-icon">✦</span>
+        Buat Narasi &amp; Rubrik
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Right Panel: Preview ── -->
+  <div class="panel-right">
+    <div class="preview-toolbar">
+      <span class="preview-toolbar-title">📄 Pratinjau Dokumen</span>
+      <div class="toolbar-spacer"></div>
+      <button class="btn-copy" id="btnCopy" onclick="copyOutput()" style="display:none">
+        ⧉ Salin Teks
+      </button>
+    </div>
+
+    <div class="preview-scroll">
+      <div class="doc-card">
+        <div class="doc-header">
+          <div class="doc-header-school">Rapor Naratif Siswa</div>
+          <div class="doc-header-sub">Kurikulum Merdeka · Tahun Ajaran 2024/2025</div>
+        </div>
+        <div class="doc-meta" id="docMeta" style="display:none">
+          <div class="meta-item"><span class="meta-label">Siswa:</span> <span id="metaName">—</span></div>
+          <div class="meta-item"><span class="meta-label">Mata Pelajaran:</span> <span id="metaTopic">—</span></div>
+          <div class="meta-item"><span class="meta-label">Tanggal:</span> <span id="metaDate">—</span></div>
+        </div>
+        <div class="doc-body" id="docBody">
+          <div class="state-empty">
+            <div class="state-empty-icon">📝</div>
+            <div class="state-empty-title">Dokumen Belum Dibuat</div>
+            <div class="state-empty-desc">
+              Isi formulir di sebelah kiri, lalu klik <strong>"Buat Narasi &amp; Rubrik"</strong> untuk menghasilkan rapor naratif secara otomatis.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Siap digunakan</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Char counters ──
+  document.getElementById('strengths').addEventListener('input', function() {
+    document.getElementById('str-count').textContent = this.value.length;
+  });
+  document.getElementById('weaknesses').addEventListener('input', function() {
+    document.getElementById('wk-count').textContent = this.value.length;
+  });
+
+  // ── State ──
+  let fullOutputText = '';
+
+  // ── Generate ──
+  async function generate() {
+    const studentName = document.getElementById('studentName').value.trim();
+    const topic       = document.getElementById('topic').value.trim();
+    const strengths   = document.getElementById('strengths').value.trim();
+    const weaknesses  = document.getElementById('weaknesses').value.trim();
+
+    if (!studentName || !topic) {
+      alert('Mohon isi Nama Siswa dan Topik/Mata Pelajaran terlebih dahulu.');
+      return;
+    }
+
+    // Update meta
+    document.getElementById('metaName').textContent  = studentName;
+    document.getElementById('metaTopic').textContent = topic;
+    document.getElementById('metaDate').textContent  = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+    document.getElementById('docMeta').style.display = 'flex';
+
+    // UI states
+    setStatus('busy', 'Menghubungi AI Engine...');
+    document.getElementById('btnGenerate').disabled = true;
+    document.getElementById('btnCopy').style.display = 'none';
+    fullOutputText = '';
+
+    const docBody = document.getElementById('docBody');
+    docBody.innerHTML = `
+      <div class="state-loading">
+        <div class="loader-dots"><span></span><span></span><span></span></div>
+        <div style="font-size:0.85rem; color:var(--ink-soft)">AI sedang menulis narasi…</div>
+      </div>`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentName, topic, strengths, weaknesses }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+
+      // Stream reading
+      const reader  = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer    = '';
+      let rawOutput = '';
+
+      setStatus('busy', 'Menerima narasi dari AI…');
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // keep incomplete line
+
+        for (const line of lines) {
+          if (!line.startsWith('data:')) continue;
+          const dataStr = line.replace(/^data:\s*/, '');
+          if (dataStr === '[DONE]') continue;
+
+          try {
+            const obj = JSON.parse(dataStr);
+            // Coze v3 stream events
+            if (obj.event === 'conversation.message.delta') {
+              rawOutput += obj.data?.content || '';
+              renderOutput(docBody, rawOutput);
+            }
+            if (obj.event === 'conversation.message.completed' && obj.data?.type === 'answer') {
+              rawOutput = obj.data?.content || rawOutput;
+              renderOutput(docBody, rawOutput);
+            }
+          } catch (_) { /* skip non-JSON lines */ }
+        }
+      }
+
+      fullOutputText = rawOutput;
+
+      if (!rawOutput.trim()) {
+        docBody.innerHTML = `<div class="error-box">⚠️ AI mengembalikan respons kosong. Periksa konfigurasi bot Anda di Coze.</div>`;
+        setStatus('error', 'Respons kosong dari AI');
+      } else {
+        setStatus('ready', 'Dokumen berhasil dibuat');
+        document.getElementById('btnCopy').style.display = 'flex';
+      }
+
+    } catch (err) {
+      docBody.innerHTML = `<div class="error-box">❌ <strong>Gagal:</strong> ${escHtml(err.message)}</div>`;
+      setStatus('error', 'Terjadi kesalahan');
+    } finally {
+      document.getElementById('btnGenerate').disabled = false;
+    }
+  }
+
+  // ── Render streamed markdown-ish output ──
+  function renderOutput(container, raw) {
+    // Split narrative (before first table) and rubrik (table)
+    const tableStart = raw.indexOf('|');
+    let narrative = tableStart > -1 ? raw.slice(0, tableStart) : raw;
+    let tableRaw  = tableStart > -1 ? raw.slice(tableStart) : '';
+
+    let html = '';
+
+    if (narrative.trim()) {
+      html += `<div class="output-section-label">Narasi Rapor</div>`;
+      html += `<div class="narrative-text">${escHtml(narrative.trim())}</div>`;
+    }
+
+    if (tableRaw.trim()) {
+      html += `<div class="output-section-label">Rubrik Evaluasi</div>`;
+      html += parseMarkdownTable(tableRaw);
+    }
+
+    container.innerHTML = html || container.innerHTML;
+  }
+
+  // ── Parse markdown table to HTML ──
+  function parseMarkdownTable(md) {
+    const lines = md.split('\n').filter(l => l.trim().startsWith('|'));
+    if (lines.length < 2) {
+      return `<div class="raw-output">${escHtml(md)}</div>`;
+    }
+
+    const headers = lines[0].split('|').map(s => s.trim()).filter(Boolean);
+    const rows    = lines.slice(2).map(l => l.split('|').map(s => s.trim()).filter(Boolean));
+
+    let table = `<table class="rubrik-table"><thead><tr>`;
+    headers.forEach(h => { table += `<th>${escHtml(h)}</th>`; });
+    table += `</tr></thead><tbody>`;
+    rows.forEach(r => {
+      table += `<tr>`;
+      r.forEach(cell => { table += `<td>${escHtml(cell)}</td>`; });
+      table += `</tr>`;
+    });
+    table += `</tbody></table>`;
+    return table;
+  }
+
+  // ── Copy output ──
+  function copyOutput() {
+    if (!fullOutputText) return;
+    navigator.clipboard.writeText(fullOutputText).then(() => {
+      const btn = document.getElementById('btnCopy');
+      btn.textContent = '✓ Tersalin!';
+      setTimeout(() => { btn.innerHTML = '⧉ Salin Teks'; }, 2000);
+    });
+  }
+
+  // ── Status bar ──
+  function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    dot.className = 'status-dot' + (state === 'busy' ? ' busy' : state === 'error' ? ' error' : '');
+    document.getElementById('statusText').textContent = text;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
