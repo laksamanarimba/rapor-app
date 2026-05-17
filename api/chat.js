@@ -4,7 +4,7 @@
 
 const COZE_API_URL = "https://api.coze.com/v3/chat";
 const BOT_ID = "7640860053468811317";
-const PAT_TOKEN = process.env.COZE_PAT_TOKEN";
+const PAT_TOKEN = process.env.COZE_PAT_TOKEN;
 
 export default async function handler(req, res) {
   // Only allow POST
